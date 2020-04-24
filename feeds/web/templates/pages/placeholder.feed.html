@@ -1,0 +1,23 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+
+{% for f in feed_items %}
+    <div class='feed'>
+    <p>
+        <span v-tooltip="{ content: '{{ f.get('text', 'No preview available')|escapejs }} {% if f['tags'] %} <p/> <i class=&quot;fas fa-tags fa-xs&quot;></i> {% for i in range(f['tags']|length) %} {{ f['tags'][i]|escapejs }} {% endfor %} {% endif %} <p/> {{ f['timeago'] }}' }">
+            <img src="{{ f['icon_path'] }}">
+        </span>
+        <a href="{{ f['link'] }}">{{ f['heading'] }}</a>
+        <span class="feed-tags">
+            {% if f['tags'] %}<i class="fas fa-tags fa-xs"></i>{% endif %}
+            {% for tag in f['tags'][:3] %}
+                <span class=feed-tag>
+                    <a href="{{ url_for('feed', tags=tag) }}">{{ tag }}</a>
+                </span>
+            {% endfor %}
+        </span>
+    </p>
+    </div>
+{% endfor %}
+
+{% endblock %}

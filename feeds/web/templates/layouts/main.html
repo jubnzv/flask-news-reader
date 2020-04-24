@@ -1,0 +1,109 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+
+<title>
+{% block title %}
+    {% if title %}/idie/{{ title }}{% else %}{{ '/idie/' }}{% endif %}
+{% endblock %}
+</title>
+
+<!-- meta -->
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- /meta -->
+
+<!-- styles -->
+<link type="text/css" rel="stylesheet" href="/static/css/style.css" />
+<link type="text/css" rel="stylesheet" href="/static/css/fonts.css" />
+<link type="text/css" rel="stylesheet" href="/static/css/tooltip.css" />
+<!-- /styles -->
+
+<!-- favicons -->
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<!-- /favicons -->
+
+<!-- scripts -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/gruvbox-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
+<script src="https://unpkg.com/v-tooltip"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- /scripts -->
+
+<header>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+
+  <!-- Code highlight -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/gruvbox-dark.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <nav>
+    <ul>
+      <!-- Left menu -->
+      <li class="pull-left {{'current' if title and 'index' in title }}">
+        <a href="/">/index</a>
+      </li>
+      <li class="pull-left {{'current' if title and 'feed' in title }}">
+        <a href="/feed">/feed</a>
+      </li>
+      {% if title and 'feed' in title %}
+      <li class="pull-right">
+        <a href="#"><i class="fas fa-rss"></i></a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+</header>
+
+</head>
+
+<body>
+  </p>
+
+  <!-- Wrap all page content here -->
+  <div class="body-content" id="wrap">
+    <div id="app">
+
+    <!-- Begin page content -->
+    <main id="content" role="main" class="container">
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-block alert-error fade in">
+              <a class="close" data-dismiss="alert">&times;</a>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+
+    </main>
+    </div>
+  </div>
+
+  <!-- <footer>             -->
+  <!--   {% block footer %} -->
+  <!--       © 2020        -->
+  <!--   {% endblock %}     -->
+  <!-- </footer>            -->
+</body>
+
+<!-- Our View App goes at the end of the document -->
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!'
+  },
+  delimiters: ['[[',']]']
+})
+</script>
+
+</html>

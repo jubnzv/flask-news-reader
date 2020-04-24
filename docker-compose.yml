@@ -1,0 +1,115 @@
+version: '3.5'
+
+services:
+  idie_reverse_proxy:
+    container_name: idie_reverse_proxy_container
+    image: traefik:v2.2
+    command:
+      # - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--certificatesresolvers.myresolver.acme.email=jubnzv@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+    restart: unless-stopped
+    networks:
+      - idie_external_network
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./deploy/traefik/acme.json:/acme.json
+
+  idie_web:
+    container_name: idie_web_container
+    image: idie_web
+    environment:
+      PG_URI: "postgres"
+      PG_USER: ${POSTGRES_USER:-postgres}
+      PG_PASS: ${POSTGRES_PASSWORD:-changeme}
+      PG_PORT: 5432
+      PGDATA: /data/postgres
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    volumes:
+      - .:/app
+      - /deploy/nginx-conf.d/:/etc/nginx/conf.d/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.idie_web.rule=Host(`idie.ru`)"
+      - "traefik.http.routers.idie_web.entrypoints=websecure"
+      - "traefik.http.routers.idie_web.tls=true"
+      - "traefik.http.routers.idie_web.tls.certresolver=myresolver"
+      - "traefik.docker.network=idie_external_network"
+    restart: on-failure
+    networks:
+      - idie_external_network
+      - idie_internal_network
+    depends_on:
+      - postgres
+      - redis
+      - idie_observer
+
+  idie_observer:
+    container_name: idie_observer_container
+    image: idie_observer
+    environment:
+      PG_URI: "postgres"
+      PG_USER: ${POSTGRES_USER:-postgres}
+      PG_PASS: ${POSTGRES_PASSWORD:-changeme}
+      PG_PORT: 5432
+      PGDATA: /data/postgres
+    build:
+      context: .
+      dockerfile: Dockerfile.observer
+    restart: on-failure
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - idie_internal_network
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - idie_internal_network
+    restart: unless-stopped
+
+  redis:
+    container_name: redis_container
+    hostname: redis
+    image: "redis:alpine"
+    command: ["redis-server", "--appendonly", "yes"]
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - redis-data:/data
+    networks:
+      - idie_internal_network
+
+networks:
+  idie_internal_network:
+    driver: bridge
+  idie_external_network:
+    external: true
+
+volumes:
+    postgres:
+    redis-data:

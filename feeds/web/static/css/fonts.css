@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Iosevka';
+  font-style: normal;
+  font-weight: 400;
+  src: local('/fonts/iosevka-regular.woff2') format('woff2');
+}
+
+body {
+  font-family: 'Iosevka';
+}
+
+head {
+  font-family: 'Iosevka';
+}

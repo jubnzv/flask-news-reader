@@ -1,0 +1,16 @@
+FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
+
+RUN apk --update add --no-cache bash vim                                            && \
+    apk add --no-cache postgresql-libs                                              && \
+    apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev libpq      && \
+    apk add --no-cache libxml2-dev libxslt-dev python-dev libffi-dev                && \
+    apk add --no-cache jpeg-dev zlib-dev
+
+COPY requirements.txt /var/www/requirements.txt
+RUN unset -v PYTHONPATH
+RUN pip3 install -r /var/www/requirements.txt
+
+ENV STATIC_URL /static
+ENV STATIC_PATH /app/feeds/web/static
+
+# vim:set ft=dockerfile et sw=4 ts=4:
