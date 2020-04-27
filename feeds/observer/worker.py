@@ -108,14 +108,21 @@ async def parse_hn_items_from_json(feed: models.Feed, data: str):
                 except ValueError:
                     continue
 
+                link = json_item.get('url')
+                title = json_item.get('title')
+                if not title or not link:
+                    continue
+                if title.startswith('Ask HN:') and not link.startswith('http'):
+                    link = f'https://news.ycombinator.com/{link}'
+
                 try:
-                    summary, keywords = parse_article(json_item.get('url'))
+                    summary, keywords = parse_article(link)
                 except ArticleException:
                     summary = ""
                     keywords = []
 
-                new_item = models.create_item(heading=json_item.get('title'),
-                                              link=json_item.get('url'),
+                new_item = models.create_item(heading=title,
+                                              link=link,
                                               text=summary)
                 new_item.datetime = dt
                 new_item.feed_id = feed.id
@@ -149,23 +156,6 @@ def get_feed_icon_path(feed: models.Item, feed_name: str):
             feed_icon = '/static/icons/default.png'
 
     return feed_icon
-
-
-def parse_hn_items(data: str) -> List[models.Item]:
-    """Parse HN using html scrapping."""
-    model_items = []
-    soup = BeautifulSoup(data, "html.parser")
-
-    items = soup.find_all("a", {"class": "storylink"})
-    for item in items:
-        heading = item.text
-        link = item.get('href')
-        # TODO:
-        if heading.startswith('Ask HN:') and not link.startswith('http'):
-            link = f'https://news.ycombinator.com/{link}'
-        model_items.append(models.create_item(heading=heading, link=link))
-
-    return model_items
 
 
 async def fetch_sources(sources):

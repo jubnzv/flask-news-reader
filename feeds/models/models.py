@@ -185,7 +185,7 @@ def set_default_feed_sources():
 
 def save_item(item: Item, tags: List[str] = []):
     """Save parsed items with related keywords into database."""
-    if tags:
+    if tags and not item.tags:
         log.debug(f'Item={item.link}: start tags={[t.text for t in item.tags]}')
         item.tags = []
         for i, t in enumerate(tags):
