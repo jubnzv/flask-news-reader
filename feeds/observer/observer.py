@@ -16,14 +16,11 @@ def launcher():
             break
         set_default_feed_sources()
 
-    # loop = asyncio.get_event_loop()
     loop = asyncio.new_event_loop()
     loop.run_until_complete(fetch_sources(sources))
 
 
 def run():
-    # loop = asyncio.get_event_loop()
-
     if DEBUG:
         duration = dict(hour='*', minute='*/1')
     else:

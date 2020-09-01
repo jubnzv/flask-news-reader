@@ -25,6 +25,8 @@ def initialize_database():
         return
 
     print(f'Database created: {database_exists(engine.url)}')
+
+    # Drop existing tables
     for table_name in ['feeds', 'items', 'tags', 'alembic_version']:
         sql = f'DROP TABLE IF EXISTS {table_name} CASCADE;'
         result = engine.execute(sql)

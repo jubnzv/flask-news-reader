@@ -1,11 +1,15 @@
 # Flask news reader
 
+Small Flask application that shows news articles with a brief summary in popup tooltips.
+
 ![Screenshot](./assets/screenshot.png)
 
-* [Traefik](https://traefik.io) reverse proxy
+## Overview
+
 * Flask web application deployed with nginx and uWSGI using [uwsgi-nginx-flask-docker](https://github.com/tiangolo/uwsgi-nginx-flask-docker) container
 * Auxiliary [script](./feeds/observer) that parses the sites and summarizes articles using [NTLK](http://https://www.nltk.org) module
-* Postgres and redis for data storage.
+* [traefik](https://traefik.io) reverse proxy
+* postgres and redis for data storage
 
 ## Setup
 
