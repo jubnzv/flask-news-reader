@@ -12,7 +12,9 @@ def install_ntlk():
 
 def initialize_database():
     from sqlalchemy import create_engine
-    from sqlalchemy_utils import database_exists, create_database
+    from sqlalchemy_utils import (database_exists,
+                                  create_database,
+                                  drop_database)
     engine = create_engine(f'postgresql://{PG_USER}:{PG_PASS}@{PG_URI}/feeds')
     if not database_exists(engine.url):
         create_database(engine.url)
